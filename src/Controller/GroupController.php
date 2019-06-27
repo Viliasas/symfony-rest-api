@@ -5,12 +5,12 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
-class UserController extends AbstractController {
+class GroupController extends AbstractController {
 
     /**
-     * @Route("/users", methods={"GET"}, name="user_list")
+     * @Route("/groups", methods={"GET"}, name="group_list")
      */
-    public function list() {
+    public function index() {
         return $this->json([]);
     }
 
