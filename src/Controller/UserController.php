@@ -8,7 +8,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class UserController extends AbstractController {
+class UserController extends AbstractController
+{
 
     /**
      * @var \Doctrine\ORM\EntityManagerInterface
@@ -20,14 +21,16 @@ class UserController extends AbstractController {
      *
      * @param \Doctrine\ORM\EntityManagerInterface $entityManager
      */
-    public function __construct(EntityManagerInterface $entityManager) {
+    public function __construct(EntityManagerInterface $entityManager)
+    {
         $this->entityManager = $entityManager;
     }
 
     /**
      * @Route("/users", methods={"GET"}, name="user_list")
      */
-    public function list() {
+    public function list()
+    {
         return $this->json($this->entityManager->getRepository(User::class)
             ->findAll());
     }
@@ -35,14 +38,16 @@ class UserController extends AbstractController {
     /**
      * @Route("/users", methods={"POST"}, name="user_update")
      */
-    public function update(UserInterface $user) {
+    public function update(UserInterface $user)
+    {
         return $this->json([]);
     }
 
     /**
      * @Route("users/{username}", methods={"DELETE"}, name="user_delete")
      */
-    public function delete(UserInterface $user, string $username) {
+    public function delete(UserInterface $user, string $username)
+    {
         if (strcasecmp($user->getUsername(), $username) === 0) {
             return $this->json([
                 'success' => FALSE,
