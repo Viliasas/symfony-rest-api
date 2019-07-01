@@ -10,7 +10,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class UserController extends AbstractController
 {
-
     /**
      * @var \Doctrine\ORM\EntityManagerInterface
      */
@@ -74,5 +73,4 @@ class UserController extends AbstractController
             'message' => 'User successfully deleted'
         ]);
     }
-
 }

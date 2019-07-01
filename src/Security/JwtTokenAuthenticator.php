@@ -15,8 +15,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 
-class JwtTokenAuthenticator extends AbstractGuardAuthenticator {
-
+class JwtTokenAuthenticator extends AbstractGuardAuthenticator
+{
     /**
      * @var \App\Service\JwtService
      */
@@ -33,22 +33,26 @@ class JwtTokenAuthenticator extends AbstractGuardAuthenticator {
      * @param \App\Service\JwtService $jwtService
      * @param \App\Repository\UserRepository $userRepository
      */
-    public function __construct(JwtService $jwtService, UserRepository $userRepository) {
+    public function __construct(JwtService $jwtService, UserRepository $userRepository)
+    {
         $this->jwtService = $jwtService;
         $this->userRepository = $userRepository;
     }
 
-    public function supports(Request $request) {
+    public function supports(Request $request)
+    {
         return $request->headers->has('Authorization');
     }
 
-    public function getCredentials(Request $request) {
+    public function getCredentials(Request $request)
+    {
         return [
             'token' => trim(str_replace('Bearer', '', $request->headers->get('Authorization')))
         ];
     }
 
-    public function getUser($credentials, UserProviderInterface $userProvider): UserInterface {
+    public function getUser($credentials, UserProviderInterface $userProvider): UserInterface
+    {
         $authToken = $credentials['token'];
 
         if (is_null($authToken)) {
@@ -70,11 +74,13 @@ class JwtTokenAuthenticator extends AbstractGuardAuthenticator {
         }
     }
 
-    public function checkCredentials($credentials, UserInterface $user) {
+    public function checkCredentials($credentials, UserInterface $user)
+    {
         return TRUE;
     }
 
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception) {
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
+    {
         $data = [
             'message' => strtr($exception->getMessageKey(), $exception->getMessageData())
         ];
@@ -82,11 +88,13 @@ class JwtTokenAuthenticator extends AbstractGuardAuthenticator {
         return new JsonResponse($data, Response::HTTP_FORBIDDEN);
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey) {
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
+    {
         return NULL;
     }
 
-    public function start(Request $request, AuthenticationException $authException = NULL) {
+    public function start(Request $request, AuthenticationException $authException = NULL)
+    {
         $data = [
             'message' => 'Authentication Required'
         ];
@@ -94,8 +102,8 @@ class JwtTokenAuthenticator extends AbstractGuardAuthenticator {
         return new JsonResponse($data, Response::HTTP_UNAUTHORIZED);
     }
 
-    public function supportsRememberMe() {
+    public function supportsRememberMe()
+    {
         return FALSE;
     }
-
 }

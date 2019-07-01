@@ -8,7 +8,6 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class AccountController extends AbstractController
 {
-
     /**
      * @var \App\Service\JwtService
      */
@@ -32,5 +31,4 @@ class AccountController extends AbstractController
             'token' => $this->jwtService->generateToken($user)
         ]);
     }
-
 }

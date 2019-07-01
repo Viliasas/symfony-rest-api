@@ -6,8 +6,8 @@ use Firebase\JWT\JWT;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class JwtService {
-
+class JwtService
+{
     /**
      * @var string Base url of the system
      */
@@ -28,7 +28,8 @@ class JwtService {
      *
      * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
      */
-    public function __construct(RequestStack $requestStack) {
+    public function __construct(RequestStack $requestStack)
+    {
         $this->baseUrl = $requestStack->getCurrentRequest()
             ->getSchemeAndHttpHost();
 
@@ -43,7 +44,8 @@ class JwtService {
      *
      * @return \stdClass|null
      */
-    public function validateToken(string $token): ?\stdClass {
+    public function validateToken(string $token): ?\stdClass
+    {
         return JWT::decode($token, $this->publicKey, ['RS256']);
     }
 
@@ -54,7 +56,8 @@ class JwtService {
      *
      * @return string
      */
-    public function generateToken(UserInterface $user): string {
+    public function generateToken(UserInterface $user): string
+    {
         $token = [
             'iss' => $this->baseUrl,
             'aud' => $this->baseUrl,
@@ -66,5 +69,4 @@ class JwtService {
 
         return JWT::encode($token, $this->privateKey, 'RS256');
     }
-
 }

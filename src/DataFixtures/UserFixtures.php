@@ -10,7 +10,6 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class UserFixtures extends Fixture
 {
-
     /**
      * @var UserPasswordEncoderInterface
      */
@@ -87,5 +86,4 @@ class UserFixtures extends Fixture
 
         $manager->persist($user);
     }
-
 }
