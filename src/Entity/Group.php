@@ -31,6 +31,7 @@ class Group
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="groups")
+     * @Groups("users")
      */
     private $users;
 

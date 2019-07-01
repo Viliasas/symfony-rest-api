@@ -30,9 +30,9 @@ class GroupController extends AbstractController
     /**
      * @Route("/groups", methods={"GET"}, name="group_list")
      */
-    public function index()
+    public function list()
     {
-        return $this->json($this->entityManager->getRepository(Group::class)->findAll(), 200, [], ['groups' => 'api']);
+        return $this->json($this->entityManager->getRepository(Group::class)->findAll(), 200, [], ['groups' => ['api', 'users']]);
     }
 
     /**
