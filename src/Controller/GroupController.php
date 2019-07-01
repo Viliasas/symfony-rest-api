@@ -125,4 +125,39 @@ class GroupController extends AbstractController
             'message' => 'User successfully added to group'
         ]);
     }
+
+    /**
+     * @Route("/groups/{groupId}/{userId}", methods={"DELETE"}, name="group_dissociate", requirements={"groupId"="\d+", "userId"="\d+"})
+     */
+    public function dissociate(int $groupId, int $userId)
+    {
+        $group = $this->entityManager->getRepository(Group::class)->find($groupId);
+
+        if (is_null($group)) {
+            return $this->json([
+                'success' => FALSE,
+                'message' => 'Group not found'
+            ], 404);
+        }
+
+        $user = $this->entityManager->getRepository(User::class)->find($userId);
+
+        if (is_null($user)) {
+            return $this->json([
+                'success' => FALSE,
+                'message' => 'User not found'
+            ], 404);
+        }
+
+        $group->removeUser($user);
+
+        $this->entityManager->persist($group);
+
+        $this->entityManager->flush();
+
+        return $this->json([
+            'success' => FALSE,
+            'message' => 'User successfully removed from group'
+        ]);
+    }
 }
