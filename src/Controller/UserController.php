@@ -5,8 +5,11 @@ namespace App\Controller;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class UserController extends AbstractController
 {
@@ -35,11 +38,35 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/users", methods={"POST"}, name="user_update")
+     * @Route("/users/{id}", methods={"POST"}, name="user_update", requirements={"id"="\d+"})
      */
-    public function update(UserInterface $user)
+    public function update(Request $request, SerializerInterface $serializer, UserPasswordEncoderInterface $passwordEncoder, int $id)
     {
-        return $this->json([]);
+        $existingUser = $this->entityManager->getRepository(User::class)->find($id);
+
+        if (is_null($existingUser)) {
+            return $this->json([
+                'success' => FALSE,
+                'message' => 'User not found'
+            ], 404);
+        }
+
+        $currentPassword = $existingUser->getPassword();
+
+        $serializer->deserialize($request->getContent(), User::class, 'json', ['groups' => ['api', 'password'], 'object_to_populate' => $existingUser]);
+
+        if (strcasecmp($currentPassword, $existingUser->getPassword()) !== 0) {
+            $existingUser->setPassword($passwordEncoder->encodePassword($existingUser, $existingUser->getPassword()));
+        }
+
+        $this->entityManager->persist($existingUser);
+
+        $this->entityManager->flush();
+
+        return $this->json([
+            'success' => TRUE,
+            'message' => 'User successfully updated'
+        ]);
     }
 
     /**

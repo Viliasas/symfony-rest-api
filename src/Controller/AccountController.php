@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Service\JwtService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
@@ -23,9 +24,11 @@ class AccountController extends AbstractController
      */
     public function login()
     {
+        /** @var User $user */
         $user = $this->getUser();
 
         return $this->json([
+            'id' => $user->getId(),
             'username' => $user->getUsername(),
             'roles' => $user->getRoles(),
             'token' => $this->jwtService->generateToken($user)
