@@ -42,6 +42,7 @@ class User implements UserInterface
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\Group", mappedBy="users")
+     * @Groups("groups")
      */
     private $groups;
 
