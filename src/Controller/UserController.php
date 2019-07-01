@@ -31,7 +31,7 @@ class UserController extends AbstractController
     public function list()
     {
         return $this->json($this->entityManager->getRepository(User::class)
-            ->findAll());
+            ->findAll(), 200, [], ['groups' => 'api']);
     }
 
     /**
