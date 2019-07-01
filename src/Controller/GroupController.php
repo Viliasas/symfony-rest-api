@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Group;
 use App\Entity\User;
+use App\Model\ApiResponse;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,7 +34,9 @@ class GroupController extends AbstractController
      */
     public function list()
     {
-        return $this->json($this->entityManager->getRepository(Group::class)->findAll(), 200, [], ['groups' => ['api', 'users']]);
+        $groups = $this->entityManager->getRepository(Group::class)->findAll();
+
+        return $this->json(new ApiResponse('OK', true, $groups), 200, [], ['groups' => ['api', 'users']]);
     }
 
     /**
@@ -47,10 +50,7 @@ class GroupController extends AbstractController
         $errors = $validator->validate($group);
 
         if (count($errors) > 0) {
-            return $this->json([
-                'success' => FALSE,
-                'message' => (string)$errors
-            ], 400);
+            return $this->json(new ApiResponse((string)$errors), 400);
         }
 
         $this->entityManager->persist($group);
@@ -68,27 +68,18 @@ class GroupController extends AbstractController
         $group = $this->entityManager->getRepository(Group::class)->find($id);
 
         if (is_null($group)) {
-            return $this->json([
-                'success' => FALSE,
-                'message' => 'Group not found'
-            ], 404);
+            return $this->json(new ApiResponse('Group not found'), 404);
         }
 
         if (count($group->getUsers()) > 0) {
-            return $this->json([
-                'success' => FALSE,
-                'message' => 'Group is not empty'
-            ], 400);
+            return $this->json(new ApiResponse('Group is not empty'), 400);
         }
 
         $this->entityManager->remove($group);
 
         $this->entityManager->flush();
 
-        return $this->json([
-            'success' => TRUE,
-            'message' => 'Group successfully deleted'
-        ]);
+        return $this->json(new ApiResponse('Group successfully deleted'));
     }
 
     /**
@@ -99,19 +90,13 @@ class GroupController extends AbstractController
         $group = $this->entityManager->getRepository(Group::class)->find($groupId);
 
         if (is_null($group)) {
-            return $this->json([
-                'success' => FALSE,
-                'message' => 'Group not found'
-            ], 404);
+            return $this->json(new ApiResponse('Group not found'), 404);
         }
 
         $user = $this->entityManager->getRepository(User::class)->find($userId);
 
         if (is_null($user)) {
-            return $this->json([
-                'success' => FALSE,
-                'message' => 'User not found'
-            ], 404);
+            return $this->json(new ApiResponse('User not found'), 404);
         }
 
         $group->addUser($user);
@@ -120,10 +105,7 @@ class GroupController extends AbstractController
 
         $this->entityManager->flush();
 
-        return $this->json([
-            'success' => FALSE,
-            'message' => 'User successfully added to group'
-        ]);
+        return $this->json(new ApiResponse('User successfully added to group'));
     }
 
     /**
@@ -134,19 +116,13 @@ class GroupController extends AbstractController
         $group = $this->entityManager->getRepository(Group::class)->find($groupId);
 
         if (is_null($group)) {
-            return $this->json([
-                'success' => FALSE,
-                'message' => 'Group not found'
-            ], 404);
+            return $this->json(new ApiResponse('Group not found'), 404);
         }
 
         $user = $this->entityManager->getRepository(User::class)->find($userId);
 
         if (is_null($user)) {
-            return $this->json([
-                'success' => FALSE,
-                'message' => 'User not found'
-            ], 404);
+            return $this->json(new ApiResponse('User not found'), 404);
         }
 
         $group->removeUser($user);
@@ -155,9 +131,6 @@ class GroupController extends AbstractController
 
         $this->entityManager->flush();
 
-        return $this->json([
-            'success' => FALSE,
-            'message' => 'User successfully removed from group'
-        ]);
+        return $this->json(new ApiResponse('User successfully removed from group'));
     }
 }

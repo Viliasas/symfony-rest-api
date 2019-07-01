@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Model\ApiResponse;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -34,8 +35,9 @@ class UserController extends AbstractController
      */
     public function list()
     {
-        return $this->json($this->entityManager->getRepository(User::class)
-            ->findAll(), 200, [], ['groups' => ['api', 'groups']]);
+        $users = $this->entityManager->getRepository(User::class)->findAll();
+
+        return $this->json(new ApiResponse('OK', true, $users), 200, [], ['groups' => ['api', 'groups']]);
     }
 
     /**
@@ -46,10 +48,7 @@ class UserController extends AbstractController
         $existingUser = $this->entityManager->getRepository(User::class)->find($id);
 
         if (is_null($existingUser)) {
-            return $this->json([
-                'success' => FALSE,
-                'message' => 'User not found'
-            ], 404);
+            return $this->json(new ApiResponse('User not found'), 404);
         }
 
         $currentPassword = $existingUser->getPassword();
@@ -64,10 +63,7 @@ class UserController extends AbstractController
 
         $this->entityManager->flush();
 
-        return $this->json([
-            'success' => TRUE,
-            'message' => 'User successfully updated'
-        ]);
+        return $this->json(new ApiResponse('User successfully updated'));
     }
 
     /**
@@ -81,10 +77,7 @@ class UserController extends AbstractController
         $errors = $validator->validate($user);
 
         if (count($errors) > 0) {
-            return $this->json([
-                'success' => FALSE,
-                'message' => (string)$errors
-            ], 400);
+            return $this->json(new ApiResponse((string)$errors), 400);
         }
 
         $user->setPassword($passwordEncoder->encodePassword($user, $user->getPassword()));
@@ -103,29 +96,20 @@ class UserController extends AbstractController
     public function delete(UserInterface $user, string $username)
     {
         if (strcasecmp($user->getUsername(), $username) === 0) {
-            return $this->json([
-                'success' => FALSE,
-                'message' => 'You can not delete yourself'
-            ], 403);
+            return $this->json(new ApiResponse('You can not delete yourself'), 403);
         }
 
         $userToBeDeleted = $this->entityManager->getRepository(User::class)
             ->findOneBy(['username' => $username]);
 
         if (is_null($userToBeDeleted)) {
-            return $this->json([
-                'success' => FALSE,
-                'message' => 'User not found'
-            ], 404);
+            return $this->json(new ApiResponse('User not found'), 404);
         }
 
         $this->entityManager->remove($userToBeDeleted);
 
         $this->entityManager->flush();
 
-        return $this->json([
-            'success' => TRUE,
-            'message' => 'User successfully deleted'
-        ]);
+        return $this->json(new ApiResponse('User successfully deleted'));
     }
 }
