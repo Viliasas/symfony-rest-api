@@ -58,4 +58,35 @@ class GroupController extends AbstractController
 
         return $this->json($group);
     }
+
+    /**
+     * @Route("/groups/{id}", methods={"DELETE"}, name="group_delete", requirements={"id"="\d+"})
+     */
+    public function delete(int $id)
+    {
+        $group = $this->entityManager->getRepository(Group::class)->find($id);
+
+        if (is_null($group)) {
+            return $this->json([
+                'success' => FALSE,
+                'message' => 'Group not found'
+            ], 404);
+        }
+
+        if (count($group->getUsers()) > 0) {
+            return $this->json([
+                'success' => FALSE,
+                'message' => 'Group is not empty'
+            ], 400);
+        }
+
+        $this->entityManager->remove($group);
+
+        $this->entityManager->flush();
+
+        return $this->json([
+            'success' => TRUE,
+            'message' => 'Group successfully deleted'
+        ]);
+    }
 }
