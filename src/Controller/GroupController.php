@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Group;
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -87,6 +88,41 @@ class GroupController extends AbstractController
         return $this->json([
             'success' => TRUE,
             'message' => 'Group successfully deleted'
+        ]);
+    }
+
+    /**
+     * @Route("/groups/{groupId}/{userId}", methods={"POST"}, name="group_associate", requirements={"groupId"="\d+", "userId"="\d+"})
+     */
+    public function associate(int $groupId, int $userId)
+    {
+        $group = $this->entityManager->getRepository(Group::class)->find($groupId);
+
+        if (is_null($group)) {
+            return $this->json([
+                'success' => FALSE,
+                'message' => 'Group not found'
+            ], 404);
+        }
+
+        $user = $this->entityManager->getRepository(User::class)->find($userId);
+
+        if (is_null($user)) {
+            return $this->json([
+                'success' => FALSE,
+                'message' => 'User not found'
+            ], 404);
+        }
+
+        $group->addUser($user);
+
+        $this->entityManager->persist($group);
+
+        $this->entityManager->flush();
+
+        return $this->json([
+            'success' => FALSE,
+            'message' => 'User successfully added to group'
         ]);
     }
 }
