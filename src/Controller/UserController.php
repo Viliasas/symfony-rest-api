@@ -10,6 +10,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class UserController extends AbstractController
 {
@@ -67,6 +68,33 @@ class UserController extends AbstractController
             'success' => TRUE,
             'message' => 'User successfully updated'
         ]);
+    }
+
+    /**
+     * @Route("/users", methods={"POST"}, name="user_create")
+     */
+    public function create(Request $request, SerializerInterface $serializer, ValidatorInterface $validator, UserPasswordEncoderInterface $passwordEncoder)
+    {
+        /** @var User $user */
+        $user = $serializer->deserialize($request->getContent(), User::class, 'json');
+
+        $errors = $validator->validate($user);
+
+        if (count($errors) > 0) {
+            return $this->json([
+                'success' => FALSE,
+                'message' => (string)$errors
+            ], 400);
+        }
+
+        $user->setPassword($passwordEncoder->encodePassword($user, $user->getPassword()));
+        $user->setRoles($user->getRoles());
+
+        $this->entityManager->persist($user);
+
+        $this->entityManager->flush();
+
+        return $this->json($user);
     }
 
     /**
